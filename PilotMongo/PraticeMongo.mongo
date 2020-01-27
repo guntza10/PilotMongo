@@ -1,0 +1,378 @@
+// 1.ดัชนีชี้วัดการจัดการน้ำมิติต้นทุนทรัพยากรน้ำ (Resources, R)
+// ->(6) ปริมาณน้ำบาดาลที่พัฒนามาใช้ต่อประชากร => คำนวณได้
+// CubicMeterGroundWaterForUse
+// CountPopulation
+db.c0.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: "FALSE",
+      AdjustedCubicMeterGroundWaterForUse: "FALSE",
+      CanComputeCubicMeterGroundWaterForUse: "True"
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code",
+      sumCubicMeterGroundWaterForUse: {
+        $sum: "$CubicMeterGroundWaterForUse"
+      },
+      sumPopulation: {
+        $sum: "$CountPopulation"
+      }
+    }
+  },
+  {
+    $project: {
+      DevGroundWaterForUse: {
+        $cond: {
+          if: {
+            $eq: ["$sumPopulation", 0]
+          },
+          then: 0,
+          else: {
+            $divide: ["$sumCubicMeterGroundWaterForUse", "$sumPopulation"]
+          }
+        }
+      }
+    }
+  },
+  { $out: "TestDevGroundWaterForUse" }
+]);
+
+// 2.ดัชนีชี้วัดการจัดการน้ำมิติการจัดการน้ำเพื่อการอุปโภค บริโภค (Household consumption, H)
+// (1) ครัวเรือนในชนบทที่มีน้ำประปาใช้ต่อคร้วเรือนในชนบททั้งหมด => คำนวณได้
+// IsHouseHoldHasPlumbingCountryside
+// IsAllHouseHoldCountryside
+db.c0.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: "FALSE"
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code",
+      sumIsHouseHoldHasPlumbingCountryside: {
+        $sum: "$IsHouseHoldHasPlumbingCountryside"
+      },
+      sumIsAllHouseHoldCountryside: {
+        $sum: "$IsAllHouseHoldCountryside"
+      }
+    }
+  },
+  {
+    $project: {
+      HouseHoldHasPlumbingCountryside: {
+        $cond: {
+          if: {
+            $eq: ["$sumIsAllHouseHoldCountryside", 0]
+          },
+          then: { $multiply: [0, 100] },
+          else: {
+            $multiply: [
+              {
+                $divide: [
+                  "$sumIsHouseHoldHasPlumbingCountryside",
+                  "$sumIsAllHouseHoldCountryside"
+                ]
+              },
+              100
+            ]
+          }
+        }
+      }
+    }
+  },
+  { $out: "TestHouseHoldHasPlumbingCountryside" }
+]);
+
+// 2.ดัชนีชี้วัดการจัดการน้ำมิติการจัดการน้ำเพื่อการอุปโภค บริโภค (Household consumption, H)
+// (2) ครัวเรือนในเขตเมืองที่มีน้ำประปาใช้ต่อคร้วเรือนในเขตเมืองทั้งหมด => คำนวณได้
+// IsHouseHoldHasPlumbingDistrict
+// IsAllHouseHoldDistrict
+db.c0.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: "FALSE"
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code",
+      sumIsHouseHoldHasPlumbingDistrict: {
+        $sum: "$IsHouseHoldHasPlumbingDistrict"
+      },
+      sumIsAllHouseHoldDistrict: {
+        $sum: "$IsAllHouseHoldDistrict"
+      }
+    }
+  },
+  {
+    $project: {
+      HouseHoldHasPlumbingDistrict: {
+        $cond: {
+          if: {
+            $eq: ["$sumIsAllHouseHoldDistrict", 0]
+          },
+          then: { $multiply: [0, 100] },
+          else: {
+            $multiply: [
+              {
+                $divide: [
+                  "$sumIsHouseHoldHasPlumbingDistrict",
+                  "$sumIsAllHouseHoldDistrict"
+                ]
+              },
+              100
+            ]
+          }
+        }
+      }
+    }
+  },
+  { $out: "TestHouseHoldHasPlumbingDistrict" }
+]);
+
+// 2.ดัชนีชี้วัดการจัดการน้ำมิติการจัดการน้ำเพื่อการอุปโภค บริโภค (Household consumption, H)
+// (3) สถานที่ราชการที่มีน้ำประปาใช้ต่อสถานที่ราชการทั้งหมด => คำนวณได้
+// IsGovernmentUsage
+// IsGovernment
+db.c0.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: "FALSE"
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code",
+      sumIsGovernmentUsage: {
+        $sum: "$IsGovernmentUsage"
+      },
+      sumIsGovernment: {
+        $sum: "$IsGovernment"
+      }
+    }
+  },
+  {
+    $project: {
+      PlumbingGovernmentUsage: {
+        $cond: {
+          if: {
+            $eq: ["$sumIsGovernment", 0]
+          },
+          then: { $multiply: [0, 100] },
+          else: {
+            $multiply: [
+              {
+                $divide: ["$sumIsGovernmentUsage", "$sumIsGovernment"]
+              },
+              100
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    $out: "TestPlumbingGovernmentUsage"
+  }
+]);
+
+// 2.ดัชนีชี้วัดการจัดการน้ำมิติการจัดการน้ำเพื่อการอุปโภค บริโภค (Household consumption, H)
+// (4) ครัวเรือนที่มีน้ำประปาคุณภาพดีต่อคร้วเรือนทั้งหมด => คำนวณได้
+// IsHouseHoldGoodPlumbing
+// IsHouseHold
+db.c0.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: "FALSE"
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code",
+      sumIsHouseHoldGoodPlumbing: {
+        $sum: "$IsHouseHoldGoodPlumbing"
+      },
+      sumIsHouseHold: {
+        $sum: "$IsHouseHold"
+      }
+    }
+  },
+  {
+    $project: {
+      HouseHoldGoodPlumbing: {
+        $cond: {
+          if: {
+            $eq: ["$sumIsHouseHold", 0]
+          },
+          then: { $multiply: [0, 100] },
+          else: {
+            $multiply: [
+              { $divide: ["$sumIsHouseHoldGoodPlumbing", "$sumIsHouseHold"] },
+              100
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    $out: "TestHouseHoldGoodPlumbing"
+  }
+]);
+
+// 2.ดัชนีชี้วัดการจัดการน้ำมิติการจัดการน้ำเพื่อการอุปโภค บริโภค (Household consumption, H)
+// (5) ปริมาณการใช้น้ำอุปโภค บริโภคต่อคน => คำนวณได้
+// CubicMeterGroundWaterForDrink
+// CubicMeterPlumbingForDrink
+// CubicMeterSurfaceForDrink
+// CountPopulation
+db.c0.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: "FALSE",
+      // CubicMeterGroundWaterForDrink
+      AdjustedCubicMeterGroundWaterForDrink: "FALSE",
+      CanComputeCubicMeterGroundWaterForDrink: "True",
+      // CubicMeterPlumbingForDrink
+      CanComputeCubicMeterPlumbingForDrink: "True",
+      // CubicMeterSurfaceForDrink
+      AdjustedCubicMeterSurfaceForDrink: "FALSE",
+      CanComputeCubicMeterSurfaceForDrink: "True"
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code",
+      sumCubicMeterGroundWaterForDrink: {
+        $sum: "$CubicMeterGroundWaterForDrink"
+      },
+      sumCubicMeterPlumbingForDrink: {
+        $sum: "$CubicMeterPlumbingForDrink"
+      },
+      sumCubicMeterSurfaceForDrink: {
+        $sum: "$CubicMeterSurfaceForDrink"
+      },
+      sumCountPopulation: {
+        $sum: "$CountPopulation"
+      },
+      totalCubicMeterUsage: {
+        $add: [
+          "$sumCubicMeterGroundWaterForDrink",
+          "$sumCubicMeterPlumbingForDrink",
+          "$sumCubicMeterSurfaceForDrink"
+        ]
+      }
+    }
+  },
+  {
+    $project: {
+      WaterUsagePerPeople: {
+        $divide: ["$totalCubicMeterUsage", "$sumCountPopulation"]
+      }
+    }
+  },
+  {
+    $out: "TestWaterUsagePerPeople"
+  }
+]);
+
+db.c0.find({
+  Area_Code: "380101"
+});
+
+// Edit Data
+db.c99.update(
+  {
+    Area_Code: { $ne: null },
+    Duplicate: "FALSE",
+    IsHouseHold: 1
+  },
+  {
+    $set: {
+      IsAllHouseHoldDistrict: {
+        $cond: {
+          if: {
+            $and: [
+              { Ea: { $ne: null } },
+              { $eq: [{ $substr: ["$EA", 7, 1] }, "1"] }
+            ]
+          },
+          then: 1,
+          else: 0
+        }
+      },
+      IsAllHouseHoldCountryside: {
+        $cond: {
+          if: {
+            $and: [
+              { EA: { $ne: null } },
+              { $eq: [{ $substr: ["$EA", 7, 1] }, "2"] }
+            ]
+          },
+          then: 1,
+          else: 0
+        }
+      }
+    }
+  },
+  { multi: true }
+);
+// many aggregate in update
+db.c99.update(
+  {
+    Area_Code: { $ne: null },
+    Duplicate: "FALSE",
+    IsHouseHold: 1
+  },
+  [
+    {
+      $set: {
+        IsAllHouseHoldDistrict: {
+          $cond: {
+            if: {
+              $and: [
+                { Ea: { $ne: null } },
+                { $eq: [{ $substr: ["$EA", 7, 1] }, "1"] }
+              ]
+            },
+            then: 1,
+            else: 0
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        IsAllHouseHoldCountryside: {
+          $cond: {
+            if: {
+              $and: [
+                { EA: { $ne: null } },
+                { $eq: [{ $substr: ["$EA", 7, 1] }, "2"] }
+              ]
+            },
+            then: 1,
+            else: 0
+          }
+        }
+      }
+    }
+  ],
+  { multi: true }
+);
+db.version();
