@@ -1,0 +1,550 @@
+/* 
+    โรงงานอุตสาหกรรมที่มีระบบบำบัดน้ำเสียต่อโรงงานอุตสาหกรรมทั้งหมด = ( โรงงานอุตสาหกรรมที่มีระบบบำบัดน้ำเสีย / โรงงานอุตสาหกรรมทั้งหมด ) x 100 
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE",
+        }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "IsSumFactorialWaterTreatment": {
+                "$sum": "$IsFactorialWaterTreatment"
+            },
+            "IsSumFactorial": {
+                "$sum": "$IsFactorial"
+            },
+        }
+    },
+    {
+        "$project": {
+            "IsFactorialWaterTreatment": "$IsSumFactorialWaterTreatment",
+            "IsFactorial": "$IsSumFactorial",
+            "FactorialWaterTreatmentTotal": {
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$eq": ["$IsSumFactorial", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$IsSumFactorialWaterTreatment", "$IsSumFactorial"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            },
+        }
+    },
+    {
+        $out: "factorialwatertreatment"
+    }
+]);
+
+/*
+    หมู่บ้านที่มีระบบบำบัดน้ำเสียต่อหมู่บ้านทั้งหมด = (หมู่บ้านที่มีระบบบำบัดน้ำเสีย / จำนวนหมู่บ้านหรือชุมชนทั้งหมด) x 100
+    14.หมู่บ้านที่มีระบบบำบัดน้ำเสีย = IsCommunityWaterManagementHasWaterTreatment
+    39.จำนวนหมู่บ้าน/ชุมชนทั้งหมด = CountCommunity
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        },
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "IsSumCommunityWaterManagementHasWaterTreatment": {
+                "$sum": "$IsCommunityWaterManagementHasWaterTreatment"
+            },
+            "SumCountCommunity": {
+                "$sum": "$CountCommunity"
+            }
+        }
+    },
+    {
+        "$project": {
+            "IsCommunityWaterManagementHasWaterTreatment": "$IsSumCommunityWaterManagementHasWaterTreatment",
+            "CountCommunity": "$SumCountCommunity",
+            "CommunityWaterManagementHasWaterTreatmentTotal": {
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$eq": ["$SumCountCommunity", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$IsSumCommunityWaterManagementHasWaterTreatment", "$SumCountCommunity"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "commuwatermanagehaswatertreatment"
+    }
+]);
+
+/*
+    โรงานอุตสาหกรรมที่มีน้ำเสียจากระบบการผลิตต่อโรงงานอุตสาหกรรมทั้งหมด = (โรงงานอุตสาหกรรมที่มีน้ำเสียจากระบบการผลิต / โรงงานอุตสาหกรรมทั้งหมด) x 100
+    24.จำนวนโรงงานอุตสาหกรรมที่มีน้ำเสียจากระบบ = IndustryHasWasteWaterTreatment
+    12.โรงงานอุตสาหกรรมทั้งหมด = IsFactorial
+*/
+db.c88.aggregate([{
+    "$match": {
+            "EA": { 
+                "$ne": null 
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        },
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumIndustryHasWasteWaterTreatment": {
+                "$sum": "$IndustryHasWasteWaterTreatment"
+            },
+            "SumIsFactorial": {
+                "$sum": "$IsFactorial"
+            }
+        }
+    },
+    {
+        "$project": {
+            "IndustryHasWasteWaterTreatment": "$SumIndustryHasWasteWaterTreatment",
+            "IsFactorial": "$SumIsFactorial",
+            "IndustryHasWasteWaterTreatmentTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$eq": ["$SumIsFactorial", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$SumIndustryHasWasteWaterTreatment", "$SumIsFactorial"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "industryhaswastewatertreatment"
+    }
+]);
+
+/* 
+    ประชากรในพื้นที่น้ำท่วมต่อประชากรทั้งหมด = (ประชากรที่อาศัยในครัวเรือนที่มีน้ำท่วม / ประชากรทั้งหมด) x 100
+    25.ประชากรที่อาศัยในครัวเรือนที่มีน้ำท่วม = PeopleInFloodedArea
+    10.จำนวนประชากรทั้งหมด = CountPopulation
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumPeopleInFloodedArea": {
+                "$sum": "$PeopleInFloodedArea"
+            },
+            "SumCountPopulation": {
+                "$sum": "$CountPopulation"
+            }
+        }
+    },
+    {
+        "$project": {
+            "PeopleInFloodedArea": "$SumPeopleInFloodedArea",
+            "CountPopulation": "$SumCountPopulation",
+            "PeopleInFloodedAreaTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumCountPopulation", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                "$divide": ["$SumPeopleInFloodedArea","$SumCountPopulation"]
+                            },
+                            100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "peopleinfloodedarea"
+    }
+]);
+
+/*
+    ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) = ผลรวมของระยะเวลาที่น้ำท่วมขัง(ในเขตที่อยู่อาศัย) ทุกครัวเรือน / ครัวเรือนทั้งหมด
+    17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) = TimeWaterHeightCm
+    2.ครัวเรือนทั้งหมด = IsHouseHold
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumTimeWaterHeightCm": {
+                "$sum": "$TimeWaterHeightCm"
+            },
+            "SumIsHouseHold": {
+                "$sum": "$IsHouseHold"
+            }
+        }
+    },
+    {
+        "$project": {
+            "TimeWaterHeightCm": "$SumTimeWaterHeightCm",
+            "IsHouseHold": "$SumIsHouseHold",
+            "TimeWaterHeightCmTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumIsHouseHold", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$divide": ["$SumTimeWaterHeightCm","$SumIsHouseHold"] 
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "timewaterheightresidential"
+    }
+]);
+
+/*
+    ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) = ผลรวมของระดับความลึกของน้ำท่วม(ในเขตที่อยู่อาศัย) ทุกครัวเรือน / ครัวเรือนทั้งหมด
+    16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) = AvgWaterHeightCm
+    2.ครัวเรือนทั้งหมด = IsHouseHold
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumAvgWaterHeightCm": {
+                "$sum": "$AvgWaterHeightCm"
+            },
+            "SumIsHouseHold": {
+                "$sum": "$IsHouseHold"
+            }
+        }
+    },
+    {
+        "$project": {
+            "AvgWaterHeightCm": "$SumAvgWaterHeightCm",
+            "IsHouseHold": "$SumIsHouseHold",
+            "AvgWaterHeightCmTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumIsHouseHold", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$divide": ["$SumAvgWaterHeightCm","$SumIsHouseHold"]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "avgwaterheightresidential"
+    }
+]);
+
+/*
+    จำนวนประชากรวัยทำงานต่อประชากรทั้งหมด = (ประชากรวัยทำงาน / ประชากรทั้งหมด) x 100
+    11.จำนวนประชากรวัยทำงาน = CountWorkingAge
+    10.จำนวนประชากรทั้งหมด = CountPopulation
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumCountWorkingAge": {
+                "$sum": "$CountWorkingAge"
+            },
+            "SumCountPopulation": {
+                "$sum": "$CountPopulation"
+            }
+        }
+    },
+    {
+        "$project": {
+            "CountWorkingAge": "$SumCountWorkingAge",
+            "CountPopulation": "$SumCountPopulation",
+            "CountWorkingAgeTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumCountPopulation", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$SumCountWorkingAge", "$SumCountPopulation"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "workingageperpopulation"
+    }
+]);
+
+/*
+    สถานที่ราชการที่มีน้ำประปาคุณภาพดีต่อสถานที่ราชการที่มีน้ำประปาทั้งหมด = (สถานที่ราชการที่มีน้ำประปาคุณภาพดี/สถานที่ราชการที่มีน้ำประปาทั้งหมด ) x 100
+    21.สถานที่ราชการที่มีน้ำประปาที่มีคุณภาพมาตรฐาน = IsGovernmentWaterQuality
+    20.สถานที่ราชการที่มีน้ำประปาใช้ = IsGovernmentUsage
+*/
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumIsGovernmentWaterQuality": {
+                "$sum": "$IsGovernmentWaterQuality"
+            },
+            "SumIsGovernmentUsage": {
+                "$sum": "$IsGovernmentUsage"
+            }
+        }
+    },
+    {
+        "$project": {
+            "IsGovernmentWaterQuality": "$SumIsGovernmentWaterQuality",
+            "IsGovernmentUsage": "$SumIsGovernmentUsage",
+            "CountWorkingAgeTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumIsGovernmentUsage", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$divide": [
+                                "$SumIsGovernmentWaterQuality", "$SumIsGovernmentUsage"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "governmentwaterquality"
+    }
+]);
+
+
+/*
+    เวลาที่มีน้ำประปาใช้ในรอบปี = ((ผลรวมของเดือนที่มีน้ำประปาใช้ในรอบปีทุกครัวเรือน/จำนวนครัวเรือนที่มีน้ำประปาใช้)/12) x 100
+    18.ระยะเวลาที่มีน้ำประปาใช้ (เดือน) = HasntPlumbing
+*/
+
+
+/*
+    สมดุลของน้ำต้นทุนและการใช้น้ำ= A/B*100
+    A = ปริมาณการใช้น้ำบาดาลเพื่อการเกษตร +ปริมาณการใช้น้ำบาดาลเพื่อการอุตสาหกรรม + 
+        ปริมาณการใช้น้ำบาดาลเพื่อการอุปโภคบริโภค+ปริมาณการใช้น้ำประปาเพื่อการเกษตร + 
+        ปริมาณการใช้น้ำประปาเพื่อการบริการ+ปริมาณการใช้น้ำประปาเพื่อการอุตสาหกรรม + 
+        ปริมาณการใช้น้ำประปาเพื่อการอุปโภคบริโภค +ปริมาณการใช้น้ำผิวดินเพื่อการเกษตร + 
+        ปริมาณการใช้น้ำผิวดินเพื่อการบริการ+ปริมาณการใช้น้ำผิวดินเพื่อการอุตสาหกรรม + 
+        ปริมาณการใช้น้ำผิวดินเพื่อการอุปโภคบริโภค+ปริมาณน้ำรักษาระบบนิเวศ+การระเหยรายปี
+    26.ปริมาณการใช้น้ำบาดาลเพื่อการเกษตร(น้ำบาดาล น้ำซื้อ) = CubicMeterGroundWaterForAgriculture
+    28.ปริมาณการใช้น้ำบาดาลเพื่อการอุตสาหกรรม(น้ำบาดาล น้ำซื้อ) = CubicMeterGroundWaterForProduct
+    29.ปริมาณการใช้น้ำบาดาลเพื่อการอุปโภคบริโภค(น้ำบาดาล น้ำซื้อ) = CubicMeterGroundWaterForDrink
+    30.ปริมาณการใช้น้ำประปาเพื่อการเกษตร = CubicMeterPlumbingForAgriculture
+    31.ปริมาณการใช้น้ำประปาเพื่อการบริการ = CubicMeterPlumbingForService
+    32.ปริมาณการใช้น้ำประปาเพื่อการอุตสาหกรรม = CubicMeterPlumbingForProduct
+    33.ปริมาณการใช้น้ำประปาเพื่อการอุปโภคบริโภค = CubicMeterPlumbingForDrink
+    34.ปริมาณการใช้น้ำผิวดินเพื่อการเกษตร (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ) = CubicMeterSurfaceForAgriculture
+    35.ปริมาณการใช้น้ำผิวดินเพื่อการบริการ (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ) = CubicMeterSurfaceForService
+    36.ปริมาณการใช้น้ำผิวดินเพื่อการอุตสาหกรรม (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ) = CubicMeterSurfaceForProduct
+    37.ปริมาณการใช้น้ำผิวดินเพื่อการอุปโภคบริโภค (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ) = CubicMeterSurfaceForDrink
+    ปริมาณน้ำรักษาระบบนิเวศข้อมูลจากหน่วยงาน
+
+    B = [(แหล่งน้ำขนาดใหญ่ กลาง และเล็ก/จำนวนหมู่บ้านทั้งหมดที่ใช้น้ำในแหล่งน้ำ) x 
+        จำนวนหมู่บ้านในตำบลที่ใช้น้ำในแหล่งน้ำ]+[(ปริมาตรความจุใช้งานของอ่างเก็บน้ำ/จำนวนหมู่บ้านทั้งหมดที่ใช้น้ำในอ่างเก็บน้ำ) x 
+        จำนวนหมู่บ้านในตำบลที่ใช้น้ำในอ่างเก็บน้ำ]+ปริมาณน้ำท่าเฉลี่ยรายปี+ปริมาณการเติมน้ำบาดาลรายปี
+   
+
+*/
+
+
+/**/ 
+db.c88.aggregate([{
+        "$match": {
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        }
+    },
+    {
+        "$limit": 500000
+    },
+    {
+        "$project": {
+            "_id":  { "$toString" : "$_id"},
+            "SampleId": "$SampleId",
+            "EA": { "$toString" : "$EA"},
+            "IsHouseHold": "$IsHouseHold",
+            "District":{
+                "$substr": ["$EA", 7, 1]
+            },
+           "Result": {
+            //    "$cond": {
+            //        if: {
+            //            "$eq" : ["$EA", null]
+            //        },
+            //        then: 0,
+            //        else: {
+            //            "$cond": {
+            //                if: {
+            //                    "$and": [
+            //                        {"$eq": ["$IsHouseHold", 1]},
+            //                        {"$eq": ["$District", "1"]}
+            //                     ]
+            //                },
+            //                then: 1,
+            //                else: 2
+            //            }
+            //        }
+            //    }
+                "$switch": {
+                    branches: [
+                        { case: { "$eq": ["$IsHouseHold", 0]}, then: 1},
+                        { case: { "$and": [ {"$eq": ["$IsHouseHold", 1]}, {"$eq": [{"$substr": ["$EA", 7, 1]}, "1"] }]}, then: 2},
+                        { case: { "$and": [ {"$eq": ["$IsHouseHold", 1]}, {"$eq": [{"$substr": ["$EA", 7, 1]}, "2"] }]}, then: 3}
+                    ],
+                    default: 0
+                }
+           }
+        }
+    },
+    {
+        "$out": "testdata1"
+    }
+]);
+
+db.testdata1.drop();
+
+/* update */
+db.c99.updateMany(
+    {
+        IsHouseHold: { $eq:1 },
+    },
+    // {
+    //     // "$filter": {
+    //         $cond: {
+    //             $and: [
+    //                 { $eq: ["$IsHouseHold", 1] },
+    //                 { $eq: [{ $substr: ["$EA", 7, 1] }, "1"] }
+    //             ]
+    //         },
+    //     // }
+    // },
+    {
+        "$set": {"IsAllHouseHoldDistrict": 1 },
+        "$set": {"IsAllHouseHoldCountryside": 0}
+    }
+);
