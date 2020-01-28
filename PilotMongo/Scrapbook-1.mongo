@@ -106,7 +106,7 @@ db.c88.aggregate([{
         }
     },
     {
-        "$out": "commuwatermanagehaswatertreatment"
+        "$out": "commuwaterwatertreatment"
     }
 ]);
 
@@ -163,7 +163,7 @@ db.c88.aggregate([{
         }
     },
     {
-        "$out": "industryhaswastewatertreatment"
+        "$out": "industrywatertreatment"
     }
 ]);
 
@@ -434,13 +434,6 @@ db.c88.aggregate([{
     }
 ]);
 
-
-/*
-    เวลาที่มีน้ำประปาใช้ในรอบปี = ((ผลรวมของเดือนที่มีน้ำประปาใช้ในรอบปีทุกครัวเรือน/จำนวนครัวเรือนที่มีน้ำประปาใช้)/12) x 100
-    18.ระยะเวลาที่มีน้ำประปาใช้ (เดือน) = HasntPlumbing
-*/
-
-
 /*
     สมดุลของน้ำต้นทุนและการใช้น้ำ= A/B*100
     A = ปริมาณการใช้น้ำบาดาลเพื่อการเกษตร +ปริมาณการใช้น้ำบาดาลเพื่อการอุตสาหกรรม + 
@@ -469,8 +462,69 @@ db.c88.aggregate([{
 
 */
 
+/* join table */
+db.commuwatermanagehaswatertreatment.aggregate([{
+        "$lookup": {
+            "from": "factorialwatertreatment",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "factorial_doc"
+        },
+    },
+    {
+        "$lookup": {
+            "from": "industryhaswastewatertreatment",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "industry_doc"
+        },
+    },
+    {
+         "$lookup": {
+            "from": "TestDevGroundWaterForUse",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "TestDevGroundWaterForUse_doc"
+        },
+    },
+    {
+      "$replaceRoot": { 
+          "newRoot": { 
+              "$mergeObjects": [ { 
+                  "$arrayElemAt": [ 
+                      "$factorial_doc", 0 
+                    ] 
+                }, 
+                { 
+                  "$arrayElemAt": [ 
+                      "$industry_doc", 0 
+                    ] 
+                }, 
+                { 
+                  "$arrayElemAt": [ 
+                      "$TestDevGroundWaterForUse_doc", 0 
+                    ] 
+                }, 
+                "$$ROOT" 
+                ]
+            } 
+        }
+    },
+    { 
+        "$project": { 
+        "FactorialWaterTreatmentTotal": "$FactorialWaterTreatmentTotal",
+        "IndustryHasWasteWaterTreatmentTotal": "$IndustryHasWasteWaterTreatmentTotal",
+        "CommunityWaterManagementHasWaterTreatmentTotal":"$CommunityWaterManagementHasWaterTreatmentTotal",
+        "DevGroundWaterForUse": "$DevGroundWaterForUse"
+        } 
+    },
+    {
+        "$out": ""
+    }
+]);
 
-/**/ 
+
+/*
 db.c88.aggregate([{
         "$match": {
             "Area_Code": {
@@ -528,7 +582,7 @@ db.c88.aggregate([{
 
 db.testdata1.drop();
 
-/* update */
+//update 
 db.c99.updateMany(
     {
         IsHouseHold: { $eq:1 },
@@ -548,3 +602,4 @@ db.c99.updateMany(
         "$set": {"IsAllHouseHoldCountryside": 0}
     }
 );
+*/ 
