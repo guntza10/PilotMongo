@@ -269,20 +269,22 @@ db.c88.aggregate([
       },
       sumCountPopulation: {
         $sum: "$CountPopulation"
-      },
-      totalCubicMeterUsage: {
-        $add: [
-          "$sumCubicMeterGroundWaterForDrink",
-          "$sumCubicMeterPlumbingForDrink",
-          "$sumCubicMeterSurfaceForDrink"
-        ]
       }
     }
   },
   {
     $project: {
       WaterUsagePerPeople: {
-        $divide: ["$totalCubicMeterUsage", "$sumCountPopulation"]
+        $divide: [
+          {
+            $add: [
+              "$sumCubicMeterGroundWaterForDrink",
+              "$sumCubicMeterPlumbingForDrink",
+              "$sumCubicMeterSurfaceForDrink"
+            ]
+          },
+          "$sumCountPopulation"
+        ]
       }
     }
   },
@@ -376,3 +378,12 @@ db.c88.update(
   { multi: true }
 );
 db.version();
+
+db.TestDevGroundWaterForUse.aggregate([
+  {
+    $lookup: {
+      from: "TestHouseHoldHasPlumbingCountryside",
+      localField: ""
+    }
+  }
+]);
