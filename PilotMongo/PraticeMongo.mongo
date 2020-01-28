@@ -379,11 +379,52 @@ db.c88.update(
 );
 db.version();
 
+// Test Join
 db.TestDevGroundWaterForUse.aggregate([
   {
     $lookup: {
-      from: "TestHouseHoldHasPlumbingCountryside",
-      localField: ""
+      from: "TestHouseHoldGoodPlumbing",
+      localField: "_id",
+      foreignField: "_id",
+      as: "collection1"
     }
+  },
+  {
+    $lookup: {
+      from: "TestHouseHoldHasPlumbingDistrict",
+      localField: "_id",
+      foreignField: "_id",
+      as: "collection2"
+    }
+  },
+  {
+    $lookup: {
+      from: "TestHouseHoldHasPlumbingCountryside",
+      localField: "_id",
+      foreignField: "_id",
+      as: "collection3"
+    }
+  },
+  {
+    $replaceRoot: {
+      newRoot: {
+        $mergeObjects: [
+          { $arrayElemAt: ["$collection1", 0] },
+          { $arrayElemAt: ["$collection2", 0] },
+          { $arrayElemAt: ["$collection3", 0] },
+          "$$ROOT"
+        ]
+      }
+    }
+  },
+  {
+    $project: {
+      collection1: 0,
+      collection2: 0,
+      collection3: 0
+    }
+  },
+  {
+    $out: "TestJoinFinal"
   }
 ]);
