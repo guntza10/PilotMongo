@@ -462,64 +462,68 @@ db.c88.aggregate([{
 
 */
 
-/* join table */
-db.commuwatermanagehaswatertreatment.aggregate([{
+/* join table final*/
+db.BaseCollection3.aggregate([
+    {
         "$lookup": {
-            "from": "factorialwatertreatment",
+            "from": "TestHouseHoldGoodPlumbing",
             "localField": "_id",
             "foreignField": "_id",
             "as": "factorial_doc"
         },
     },
     {
+        "$unwind": {path:"$factorial_doc",preserveNullAndEmptyArrays: true}
+    },
+    {
         "$lookup": {
-            "from": "industryhaswastewatertreatment",
+            "from": "TestHouseHoldHasPlumbingDistrict",
             "localField": "_id",
             "foreignField": "_id",
             "as": "industry_doc"
         },
     },
     {
-         "$lookup": {
-            "from": "TestDevGroundWaterForUse",
+        "$unwind": {path:"$industry_doc",preserveNullAndEmptyArrays: true}
+    },
+    {
+        "$lookup": {
+            "from": "TestHouseHoldHasPlumbingCountryside",
             "localField": "_id",
             "foreignField": "_id",
-            "as": "TestDevGroundWaterForUse_doc"
+            "as": "rr"
         },
     },
     {
-      "$replaceRoot": { 
-          "newRoot": { 
-              "$mergeObjects": [ { 
-                  "$arrayElemAt": [ 
-                      "$factorial_doc", 0 
-                    ] 
-                }, 
-                { 
-                  "$arrayElemAt": [ 
-                      "$industry_doc", 0 
-                    ] 
-                }, 
-                { 
-                  "$arrayElemAt": [ 
-                      "$TestDevGroundWaterForUse_doc", 0 
-                    ] 
-                }, 
-                "$$ROOT" 
-                ]
-            } 
-        }
+        "$unwind": {path:"$rr",preserveNullAndEmptyArrays: true}
+    },
+    {
+        "$lookup": {
+            "from": "TestDevGroundWaterForUse",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "rrr"
+        },
+    },
+    {
+        "$unwind": {path:"$rrr",preserveNullAndEmptyArrays: true}
     },
     { 
         "$project": { 
-        "FactorialWaterTreatmentTotal": "$FactorialWaterTreatmentTotal",
-        "IndustryHasWasteWaterTreatmentTotal": "$IndustryHasWasteWaterTreatmentTotal",
-        "CommunityWaterManagementHasWaterTreatmentTotal":"$CommunityWaterManagementHasWaterTreatmentTotal",
-        "DevGroundWaterForUse": "$DevGroundWaterForUse"
+            // "_id": "$_id",
+            "factorial_doc": { $ifNull: ["$factorial_doc.HouseHoldGoodPlumbing",0]},
+            "industry_doc": { $ifNull: ["$industry_doc.HouseHoldHasPlumbingDistrict",0]},
+            "HouseHoldHasPlumbingCountryside": { $ifNull: ["$rr.HouseHoldHasPlumbingCountryside",0]},
+            "DevGroundWaterForUse": { $ifNull: ["$rrr.DevGroundWaterForUse",0]}
         } 
     },
     {
-        "$out": ""
+        "$sort": {
+            "_id": 1
+        }
+    },
+    {
+        "$out": "xx45"
     }
 ]);
 
