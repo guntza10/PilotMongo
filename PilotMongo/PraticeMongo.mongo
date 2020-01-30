@@ -380,7 +380,15 @@ db.c88.update(
 db.version();
 
 // Test Join
-db.TestDevGroundWaterForUse.aggregate([
+db.BaseCollection3.aggregate([
+  {
+    $lookup: {
+      from: "TestDevGroundWaterForUse",
+      localField: "_id",
+      foreignField: "_id",
+      as: "collection0"
+    }
+  },
   {
     $lookup: {
       from: "TestHouseHoldGoodPlumbing",
@@ -409,6 +417,7 @@ db.TestDevGroundWaterForUse.aggregate([
     $replaceRoot: {
       newRoot: {
         $mergeObjects: [
+          { $arrayElemAt: ["$collection0", 0] },
           { $arrayElemAt: ["$collection1", 0] },
           { $arrayElemAt: ["$collection2", 0] },
           { $arrayElemAt: ["$collection3", 0] },
@@ -419,12 +428,53 @@ db.TestDevGroundWaterForUse.aggregate([
   },
   {
     $project: {
+      collection0: 0,
       collection1: 0,
       collection2: 0,
       collection3: 0
     }
   },
   {
-    $out: "TestJoinFinal"
+    $out: "TestJoinFinal4"
+  }
+]);
+
+db.c88.aggregate([
+  {
+    $match: {
+      Area_Code: { $ne: null }
+    }
+  },
+  {
+    $group: {
+      _id: "$Area_Code"
+    }
+  },
+  {
+    $out: "BaseCollection"
+  }
+]);
+
+db.ea.aggregate([
+  {
+    $group: {
+      _id: "$Area_Code"
+    }
+  },
+  {
+    $sort: {
+      _id: 1
+    }
+  },
+  // {
+  //   $project: {
+  //     DevGroundWaterForUse: null,
+  //     HouseHoldGoodPlumbing: null,
+  //     HouseHoldHasPlumbingDistrict: null,
+  //     HouseHoldHasPlumbingCountryside: null
+  //   }
+  // },
+  {
+    $out: "BaseCollection"
   }
 ]);
