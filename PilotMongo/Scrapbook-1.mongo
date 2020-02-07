@@ -646,7 +646,7 @@ db.ea.aggregate([
             "CWT": 1,
             "CWT_NAME": 1,
             "AMP": 1,
-            "AMT_NAME": 1,
+            "AMP_NAME": 1,
             "TAM": 1,
             "TAM_NAME": 1,
             "DISTRICT": 1,
@@ -676,6 +676,52 @@ db.ea.aggregate([
     // },
     {
         "$out": "ResultPopulation"
+    }
+]);
+
+db.v5.aggregate([{
+        "$lookup": {
+            "from": "ea",
+            "localField": "EA",
+            "foreignField": "_id",
+            "as": "data"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$data",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$project": {
+            "SampleId": 1,
+            "SampleType": 1,
+            "EA": 1,
+            "Status": 1,
+            "CountPopulation": 1,
+            "CountWorkingAge": 1,
+            "ResidentialPersonCount": 1,
+            "PopulationPersonCount": 1,
+            "Area_Code": "$data.Area_Code",
+            "REG": "$data.REG",
+            "REG_NAME": "$data.REG_NAME",
+            "CWT": "$data.CWT",
+            "CWT_NAME": "$data.CWT_NAME",
+            "AMP": "$data.AMP",
+            "AMP_NAME": "$data.AMP_NAME",
+            "TAM": "$data.TAM",
+            "TAM_NAME": "$data.TAM_NAME",
+            "DISTRICT": "$data.DISTRICT",
+            "MUN": "$data.MUN",
+            "MUN_NAME": "$data.MUN_NAME",
+            "TAO": "$data.TAO",
+            "TAO_NAME": "$data.TAO_NAME",
+            "EA_Code": "$data.EA",
+        }
+    },
+    {
+        "$out": "v5Poppulation"
     }
 ]);
 
