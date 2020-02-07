@@ -478,3 +478,138 @@ db.ea.aggregate([
     $out: "BaseCollection"
   }
 ]);
+
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $project: {
+      checkError: {
+        $gt: ["$ResidentialPersonCount", "$PopulationPersonCount"]
+      }
+    }
+  },
+  {
+    $out: "checkPersonCount"
+  }
+]);
+
+// errorIsAgriculture
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $project: {
+      checkError: {
+        $lt: ["$IsAgriculture", "$IsAgricultureHasIrrigationField"]
+      }
+    }
+  },
+  {
+    $out: "errorIsAgriculture"
+  }
+]);
+
+// errorIsHouseHold
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $project: {
+      checkError: {
+        $or : [
+          {
+          $lt: ["$IsHouseHold", "$IsHouseHoldGoodPlumbing"]
+          },
+          {
+          $lt: ["$IsHouseHold", "$IsHouseHoldHasPlumbingDistrict"]
+          },
+          {
+          $lt: ["$IsHouseHold", "$IsHouseHoldHasPlumbingCountryside"]
+          }
+        ]
+      }
+    }
+  },
+  {
+    $out: "errorIsHouseHold"
+  }
+]);
+
+// errorIsFactorial
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $project: {
+      checkError: {
+        $or : [
+          {
+            $lt: ["$IsAllFactorial", "$IsFactorial"]
+          },
+          {
+            $lt: ["$IsAllFactorial", "$IndustryHasWasteWaterTreatment"]
+          },
+          {
+            $lt: ["$IsAllFactorial", "$IsFactorialWaterTreatment"]
+          },
+          {
+            $lt: ["$IsAllFactorial", "$IsFactorialWaterQuality"]
+          },
+          {
+             $lt: ["$IsFactorial", "$IndustryHasWasteWaterTreatment"]
+          },
+          {
+             $lt: ["$IndustryHasWasteWaterTreatment", "$IsFactorialWaterTreatment"]
+          }
+        ]
+      }
+    }
+  },
+  {
+    $out: "errorIsFactorial"
+  }
+]);
+
+// errorIsAllCommercial
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $project: {
+      checkError: {
+        $lt: ["$IsAllCommercial", "$IsCommercialWaterQuality"]
+      }
+    }
+  },
+  {
+    $out: "errorIsAllCommercial"
+  }
+]);
+
+
