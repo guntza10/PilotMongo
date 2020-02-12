@@ -1,56 +1,56 @@
 /* 
     โรงงานอุตสาหกรรมที่มีระบบบำบัดน้ำเสียต่อโรงงานอุตสาหกรรมทั้งหมด = ( โรงงานอุตสาหกรรมที่มีระบบบำบัดน้ำเสีย / โรงงานอุตสาหกรรมทั้งหมด ) x 100 
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      IsSumFactorialWaterTreatment: {
-        $sum: "$IsFactorialWaterTreatment"
-      },
-      IsSumFactorial: {
-        $sum: "$IsFactorial"
-      }
-    }
-  },
-  {
-    $project: {
-      // "IsFactorialWaterTreatment": "$IsSumFactorialWaterTreatment",
-      // "IsFactorial": "$IsSumFactorial",
-      FactorialWaterTreatmentTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $eq: ["$IsSumFactorial", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $multiply: [
-                {
-                  $divide: ["$IsSumFactorialWaterTreatment", "$IsSumFactorial"]
-                },
-                100
-              ]
-            }
-          }
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE",
         }
-      }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "IsSumFactorialWaterTreatment": {
+                "$sum": "$IsFactorialWaterTreatment"
+            },
+            "IsSumFactorial": {
+                "$sum": "$IsFactorial"
+            },
+        }
+    },
+    {
+        "$project": {
+            "IsFactorialWaterTreatment": "$IsSumFactorialWaterTreatment",
+            "IsFactorial": "$IsSumFactorial",
+            "FactorialWaterTreatmentTotal": {
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$eq": ["$IsSumFactorial", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$IsSumFactorialWaterTreatment", "$IsSumFactorial"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            },
+        }
+    },
+    {
+        $out: "factorialwatertreatment"
     }
-  },
-  {
-    $out: "factorialwatertreatment"
-  }
 ]);
 
 /*
@@ -58,59 +58,56 @@ db.c88.aggregate([
     14.หมู่บ้านที่มีระบบบำบัดน้ำเสีย = IsCommunityWaterManagementHasWaterTreatment
     39.จำนวนหมู่บ้าน/ชุมชนทั้งหมด = CountCommunity
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      IsSumCommunityWaterManagementHasWaterTreatment: {
-        $sum: "$IsCommunityWaterManagementHasWaterTreatment"
-      },
-      SumCountCommunity: {
-        $sum: "$CountCommunity"
-      }
-    }
-  },
-  {
-    $project: {
-      // "IsCommunityWaterManagementHasWaterTreatment": "$IsSumCommunityWaterManagementHasWaterTreatment",
-      // "CountCommunity": "$SumCountCommunity",
-      CommunityWaterManagementHasWaterTreatmentTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $eq: ["$SumCountCommunity", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $multiply: [
-                {
-                  $divide: [
-                    "$IsSumCommunityWaterManagementHasWaterTreatment",
-                    "$SumCountCommunity"
-                  ]
-                },
-                100
-              ]
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        },
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "IsSumCommunityWaterManagementHasWaterTreatment": {
+                "$sum": "$IsCommunityWaterManagementHasWaterTreatment"
+            },
+            "SumCountCommunity": {
+                "$sum": "$CountCommunity"
             }
-          }
         }
-      }
+    },
+    {
+        "$project": {
+            "IsCommunityWaterManagementHasWaterTreatment": "$IsSumCommunityWaterManagementHasWaterTreatment",
+            "CountCommunity": "$SumCountCommunity",
+            "CommunityWaterManagementHasWaterTreatmentTotal": {
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$eq": ["$SumCountCommunity", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$IsSumCommunityWaterManagementHasWaterTreatment", "$SumCountCommunity"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "commuwaterwatertreatment"
     }
-  },
-  {
-    $out: "commuwaterwatertreatment"
-  }
 ]);
 
 /*
@@ -118,59 +115,56 @@ db.c88.aggregate([
     24.จำนวนโรงงานอุตสาหกรรมที่มีน้ำเสียจากระบบ = IndustryHasWasteWaterTreatment
     12.โรงงานอุตสาหกรรมทั้งหมด = IsFactorial
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      SumIndustryHasWasteWaterTreatment: {
-        $sum: "$IndustryHasWasteWaterTreatment"
-      },
-      SumIsFactorial: {
-        $sum: "$IsFactorial"
-      }
-    }
-  },
-  {
-    $project: {
-      // "IndustryHasWasteWaterTreatment": "$SumIndustryHasWasteWaterTreatment",
-      // "IsFactorial": "$SumIsFactorial",
-      IndustryHasWasteWaterTreatmentTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $eq: ["$SumIsFactorial", 0]
+db.c88.aggregate([{
+    "$match": {
+            "EA": { 
+                "$ne": null 
             },
-            then: 0,
-            else: {
-              $multiply: [
-                {
-                  $divide: [
-                    "$SumIndustryHasWasteWaterTreatment",
-                    "$SumIsFactorial"
-                  ]
-                },
-                100
-              ]
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
+        },
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumIndustryHasWasteWaterTreatment": {
+                "$sum": "$IndustryHasWasteWaterTreatment"
+            },
+            "SumIsFactorial": {
+                "$sum": "$IsFactorial"
             }
-          }
         }
-      }
+    },
+    {
+        "$project": {
+            "IndustryHasWasteWaterTreatment": "$SumIndustryHasWasteWaterTreatment",
+            "IsFactorial": "$SumIsFactorial",
+            "IndustryHasWasteWaterTreatmentTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$eq": ["$SumIsFactorial", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$SumIndustryHasWasteWaterTreatment", "$SumIsFactorial"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "industrywatertreatment"
     }
-  },
-  {
-    $out: "industrywatertreatment"
-  }
 ]);
 
 /* 
@@ -178,56 +172,54 @@ db.c88.aggregate([
     25.ประชากรที่อาศัยในครัวเรือนที่มีน้ำท่วม = PeopleInFloodedArea
     10.จำนวนประชากรทั้งหมด = CountPopulation
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      SumPeopleInFloodedArea: {
-        $sum: "$PeopleInFloodedArea"
-      },
-      SumCountPopulation: {
-        $sum: "$CountPopulation"
-      }
-    }
-  },
-  {
-    $project: {
-      PeopleInFloodedArea: "$SumPeopleInFloodedArea",
-      CountPopulation: "$SumCountPopulation",
-      PeopleInFloodedAreaTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $gt: ["$SumCountPopulation", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $multiply: [
-                {
-                  $divide: ["$SumPeopleInFloodedArea", "$SumCountPopulation"]
-                },
-                100
-              ]
-            }
-          }
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
         }
-      }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumPeopleInFloodedArea": {
+                "$sum": "$PeopleInFloodedArea"
+            },
+            "SumCountPopulation": {
+                "$sum": "$CountPopulation"
+            }
+        }
+    },
+    {
+        "$project": {
+            "PeopleInFloodedArea": "$SumPeopleInFloodedArea",
+            "CountPopulation": "$SumCountPopulation",
+            "PeopleInFloodedAreaTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumCountPopulation", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                "$divide": ["$SumPeopleInFloodedArea","$SumCountPopulation"]
+                            },
+                            100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "peopleinfloodedarea"
     }
-  },
-  {
-    $out: "peopleinfloodedarea"
-  }
 ]);
 
 /*
@@ -235,51 +227,50 @@ db.c88.aggregate([
     17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) = TimeWaterHeightCm
     2.ครัวเรือนทั้งหมด = IsHouseHold
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      SumTimeWaterHeightCm: {
-        $sum: "$TimeWaterHeightCm"
-      },
-      SumIsHouseHold: {
-        $sum: "$IsHouseHold"
-      }
-    }
-  },
-  {
-    $project: {
-      TimeWaterHeightCm: "$SumTimeWaterHeightCm",
-      IsHouseHold: "$SumIsHouseHold",
-      TimeWaterHeightCmTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $gt: ["$SumIsHouseHold", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $divide: ["$SumTimeWaterHeightCm", "$SumIsHouseHold"]
-            }
-          }
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
         }
-      }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumTimeWaterHeightCm": {
+                "$sum": "$TimeWaterHeightCm"
+            },
+            "SumIsHouseHold": {
+                "$sum": "$IsHouseHold"
+            }
+        }
+    },
+    {
+        "$project": {
+            "TimeWaterHeightCm": "$SumTimeWaterHeightCm",
+            "IsHouseHold": "$SumIsHouseHold",
+            "TimeWaterHeightCmTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumIsHouseHold", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$divide": ["$SumTimeWaterHeightCm","$SumIsHouseHold"] 
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "timewaterheightresidential"
     }
-  },
-  {
-    $out: "timewaterheightresidential"
-  }
 ]);
 
 /*
@@ -287,51 +278,50 @@ db.c88.aggregate([
     16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) = AvgWaterHeightCm
     2.ครัวเรือนทั้งหมด = IsHouseHold
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      SumAvgWaterHeightCm: {
-        $sum: "$AvgWaterHeightCm"
-      },
-      SumIsHouseHold: {
-        $sum: "$IsHouseHold"
-      }
-    }
-  },
-  {
-    $project: {
-      AvgWaterHeightCm: "$SumAvgWaterHeightCm",
-      IsHouseHold: "$SumIsHouseHold",
-      AvgWaterHeightCmTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $gt: ["$SumIsHouseHold", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $divide: ["$SumAvgWaterHeightCm", "$SumIsHouseHold"]
-            }
-          }
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
         }
-      }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumAvgWaterHeightCm": {
+                "$sum": "$AvgWaterHeightCm"
+            },
+            "SumIsHouseHold": {
+                "$sum": "$IsHouseHold"
+            }
+        }
+    },
+    {
+        "$project": {
+            "AvgWaterHeightCm": "$SumAvgWaterHeightCm",
+            "IsHouseHold": "$SumIsHouseHold",
+            "AvgWaterHeightCmTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumIsHouseHold", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$divide": ["$SumAvgWaterHeightCm","$SumIsHouseHold"]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "avgwaterheightresidential"
     }
-  },
-  {
-    $out: "avgwaterheightresidential"
-  }
 ]);
 
 /*
@@ -339,56 +329,56 @@ db.c88.aggregate([
     11.จำนวนประชากรวัยทำงาน = CountWorkingAge
     10.จำนวนประชากรทั้งหมด = CountPopulation
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      SumCountWorkingAge: {
-        $sum: "$CountWorkingAge"
-      },
-      SumCountPopulation: {
-        $sum: "$CountPopulation"
-      }
-    }
-  },
-  {
-    $project: {
-      CountWorkingAge: "$SumCountWorkingAge",
-      CountPopulation: "$SumCountPopulation",
-      CountWorkingAgeTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $gt: ["$SumCountPopulation", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $multiply: [
-                {
-                  $divide: ["$SumCountWorkingAge", "$SumCountPopulation"]
-                },
-                100
-              ]
-            }
-          }
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
         }
-      }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumCountWorkingAge": {
+                "$sum": "$CountWorkingAge"
+            },
+            "SumCountPopulation": {
+                "$sum": "$CountPopulation"
+            }
+        }
+    },
+    {
+        "$project": {
+            "CountWorkingAge": "$SumCountWorkingAge",
+            "CountPopulation": "$SumCountPopulation",
+            "CountWorkingAgeTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumCountPopulation", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$multiply": [{
+                                    "$divide": [
+                                        "$SumCountWorkingAge", "$SumCountPopulation"
+                                    ]
+                                },
+                                100
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "workingageperpopulation"
     }
-  },
-  {
-    $out: "workingageperpopulation"
-  }
 ]);
 
 /*
@@ -396,51 +386,52 @@ db.c88.aggregate([
     21.สถานที่ราชการที่มีน้ำประปาที่มีคุณภาพมาตรฐาน = IsGovernmentWaterQuality
     20.สถานที่ราชการที่มีน้ำประปาใช้ = IsGovernmentUsage
 */
-db.c88.aggregate([
-  {
-    $match: {
-      EA: {
-        $ne: null
-      },
-      Area_Code: {
-        $ne: null
-      },
-      Duplicate: "FALSE"
-    }
-  },
-  {
-    $group: {
-      _id: "$Area_Code",
-      SumIsGovernmentWaterQuality: {
-        $sum: "$IsGovernmentWaterQuality"
-      },
-      SumIsGovernmentUsage: {
-        $sum: "$IsGovernmentUsage"
-      }
-    }
-  },
-  {
-    $project: {
-      IsGovernmentWaterQuality: "$SumIsGovernmentWaterQuality",
-      IsGovernmentUsage: "$SumIsGovernmentUsage",
-      CountWorkingAgeTotal: {
-        $sum: {
-          $cond: {
-            if: {
-              $gt: ["$SumIsGovernmentUsage", 0]
+db.c88.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
             },
-            then: 0,
-            else: {
-              $divide: ["$SumIsGovernmentWaterQuality", "$SumIsGovernmentUsage"]
-            }
-          }
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": "FALSE"
         }
-      }
+    },
+    {
+        "$group": {
+            "_id": "$Area_Code",
+            "SumIsGovernmentWaterQuality": {
+                "$sum": "$IsGovernmentWaterQuality"
+            },
+            "SumIsGovernmentUsage": {
+                "$sum": "$IsGovernmentUsage"
+            }
+        }
+    },
+    {
+        "$project": {
+            "IsGovernmentWaterQuality": "$SumIsGovernmentWaterQuality",
+            "IsGovernmentUsage": "$SumIsGovernmentUsage",
+            "CountWorkingAgeTotal":{
+                "$sum": {
+                    "$cond": {
+                        if: {
+                            "$gt": ["$SumIsGovernmentUsage", 0]
+                        },
+                        then: 0,
+                        else: {
+                            "$divide": [
+                                "$SumIsGovernmentWaterQuality", "$SumIsGovernmentUsage"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "$out": "governmentwaterquality"
     }
-  },
-  {
-    $out: "governmentwaterquality"
-  }
 ]);
 
 /*
@@ -473,134 +464,265 @@ db.c88.aggregate([
 
 /* join table final*/
 db.BaseCollection3.aggregate([
-  {
-    $lookup: {
-      from: "TestHouseHoldGoodPlumbing",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection0"
+    {
+        "$lookup": {
+            "from": "TestHouseHoldGoodPlumbing",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "factorial_doc"
+        },
+    },
+    {
+        "$unwind": {path:"$factorial_doc",preserveNullAndEmptyArrays: true}
+    },
+    {
+        "$lookup": {
+            "from": "TestHouseHoldHasPlumbingDistrict",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "industry_doc"
+        },
+    },
+    {
+        "$unwind": {path:"$industry_doc",preserveNullAndEmptyArrays: true}
+    },
+    {
+        "$lookup": {
+            "from": "TestHouseHoldHasPlumbingCountryside",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "rr"
+        },
+    },
+    {
+        "$unwind": {path:"$rr",preserveNullAndEmptyArrays: true}
+    },
+    {
+        "$lookup": {
+            "from": "TestDevGroundWaterForUse",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "rrr"
+        },
+    },
+    {
+        "$unwind": {path:"$rrr",preserveNullAndEmptyArrays: true}
+    },
+    { 
+        "$project": { 
+            // "_id": "$_id",
+            "factorial_doc": { $ifNull: ["$factorial_doc.HouseHoldGoodPlumbing",0]},
+            "industry_doc": { $ifNull: ["$industry_doc.HouseHoldHasPlumbingDistrict",0]},
+            "HouseHoldHasPlumbingCountryside": { $ifNull: ["$rr.HouseHoldHasPlumbingCountryside",0]},
+            "DevGroundWaterForUse": { $ifNull: ["$rrr.DevGroundWaterForUse",0]}
+        } 
+    },
+    {
+        "$sort": {
+            "_id": 1
+        }
+    },
+    {
+        "$out": "xx45"
     }
-  },
-  {
-    $unwind: { path: "$collection0", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "TestHouseHoldHasPlumbingDistrict",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection1"
+]);
+
+db.v5.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": false
+        }
+    },
+    {
+        "$project": {
+            "checkErrors": {
+                "$or": [
+                    {
+                        "$lt": ["$IsGovernment","$IsGovernmentUsage"]
+                    },
+                    {
+                        "$lt": ["$IsGovernmentUsage","$IsGovernmentWaterQuality"]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$out": "errorIsGovernment"
     }
-  },
-  {
-    $unwind: { path: "$collection1", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "TestHouseHoldHasPlumbingCountryside",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection2"
+]);
+
+db.v5.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": false
+        }
+    },
+    {
+        "$project": {
+            "checkErrors":{
+                $or: [
+                    {
+                        "$lt": ["$CountCommunity", "$CountCommunityHasDisaster"]
+                    },
+                    {
+                        "$lt": ["$CountCommunity", "$CommunityNatureDisaster"]
+                    },
+                    {
+                        "$lt": ["$CountCommunity", "$IsCommunityWaterManagementHasWaterTreatment"]
+                    },
+                    {
+                        "$lt": ["$CountCommunityHasDisaster", "$CommunityNatureDisaster"]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$out": "errorCountCommunity"
     }
-  },
-  {
-    $unwind: { path: "$collection2", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "TestDevGroundWaterForUse",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection3"
+]);
+
+db.v5.aggregate([{
+        "$match": {
+            "EA": {
+                "$ne": null
+            },
+            "Area_Code": {
+                "$ne": null
+            },
+            "Duplicate": false
+        }
+    },
+    {
+        "$project": {
+            "checkErrors": {
+                "$or": [
+                    {
+                        "$lt": ["$CountPopulation", "$CountWorkingAge"]
+                    },
+                    {
+                        "$lt": ["$CountPopulation", "$PeopleInFloodedArea"]
+                    }
+                ]
+            }
+        }   
+    },
+    {
+        "$out": "errorCountPopulation"
     }
-  },
-  {
-    $unwind: { path: "$collection3", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "commuwaterwatertreatment",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection4"
+]);
+
+db.ea.aggregate([
+    {
+        "$lookup": {
+            "from": "Population",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "data"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$data",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$project": {
+            "Area_Code": 1,
+            "REG": 1,
+            "REG_NAME": 1,
+            "CWT": 1,
+            "CWT_NAME": 1,
+            "AMP": 1,
+            "AMP_NAME": 1,
+            "TAM": 1,
+            "TAM_NAME": 1,
+            "DISTRICT": 1,
+            "MUN": 1,
+            "MUN_NAME": 1,
+            "TAO": 1,
+            "TAO_NAME": 1,
+            "EA": 1,
+            "CountPopulation": {
+                $ifNull: ["$data.CountPopulation", 0]
+            },
+            "CountWorkingAge": {
+                $ifNull: ["$data.CountWorkingAge", 0]
+            },
+            "ResidentialPersonCount": {
+                $ifNull: ["$data.ResidentialPersonCount", 0]
+            },
+            "PopulationPersonCount": {
+                $ifNull: ["$data.PopulationPersonCount", 0]
+            },
+        }
+    },
+    // {
+    //     "$sort": {
+    //         "_id": 1
+    //     }
+    // },
+    {
+        "$out": "ResultPopulation"
     }
-  },
-  {
-    $unwind: { path: "$collection4", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "industrywatertreatment",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection5"
+]);
+
+db.v5.aggregate([{
+        "$lookup": {
+            "from": "ea",
+            "localField": "EA",
+            "foreignField": "_id",
+            "as": "data"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$data",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$project": {
+            "SampleId": 1,
+            "SampleType": 1,
+            "EA": 1,
+            "Status": 1,
+            "CountPopulation": 1,
+            "CountWorkingAge": 1,
+            "ResidentialPersonCount": 1,
+            "PopulationPersonCount": 1,
+            "Area_Code": "$data.Area_Code",
+            "REG": "$data.REG",
+            "REG_NAME": "$data.REG_NAME",
+            "CWT": "$data.CWT",
+            "CWT_NAME": "$data.CWT_NAME",
+            "AMP": "$data.AMP",
+            "AMP_NAME": "$data.AMP_NAME",
+            "TAM": "$data.TAM",
+            "TAM_NAME": "$data.TAM_NAME",
+            "DISTRICT": "$data.DISTRICT",
+            "MUN": "$data.MUN",
+            "MUN_NAME": "$data.MUN_NAME",
+            "TAO": "$data.TAO",
+            "TAO_NAME": "$data.TAO_NAME",
+            "EA_Code": "$data.EA",
+        }
+    },
+    {
+        "$out": "v5Poppulation"
     }
-  },
-  {
-    $unwind: { path: "$collection5", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "factorialwatertreatment",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection6"
-    }
-  },
-  {
-    $unwind: { path: "$collection6", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $lookup: {
-      from: "TestPlumbingGovernmentUsage",
-      localField: "_id",
-      foreignField: "_id",
-      as: "collection7"
-    }
-  },
-  {
-    $unwind: { path: "$collection7", preserveNullAndEmptyArrays: true }
-  },
-  {
-    $project: {
-      // "_id": "$_id",
-      PlumbingGovernmentUsage: {
-        $ifNull: ["$collection7.PlumbingGovernmentUsage", 0]
-      },
-      HouseHoldGoodPlumbing: {
-        $ifNull: ["$collection0.HouseHoldGoodPlumbing", 0]
-      },
-      HouseHoldHasPlumbingDistrict: {
-        $ifNull: ["$collection1.HouseHoldHasPlumbingDistrict", 0]
-      },
-      HouseHoldHasPlumbingCountryside: {
-        $ifNull: ["$collection2.HouseHoldHasPlumbingCountryside", 0]
-      },
-      DevGroundWaterForUse: {
-        $ifNull: ["$collection3.DevGroundWaterForUse", 0]
-      },
-      CommunityWaterManagementHasWaterTreatmentTotal: {
-        $ifNull: [
-          "$collection4.CommunityWaterManagementHasWaterTreatmentTotal",
-          0
-        ]
-      },
-      IndustryHasWasteWaterTreatmentTotal: {
-        $ifNull: ["$collection5.IndustryHasWasteWaterTreatmentTotal", 0]
-      },
-      FactorialWaterTreatmentTotal: {
-        $ifNull: ["$collection6.FactorialWaterTreatmentTotal", 0]
-      }
-    }
-  },
-  {
-    $sort: {
-      _id: 1
-    }
-  },
-  {
-    $out: "TestFinal"
-  }
 ]);
 
 db.ResultPopulation.aggregate(
@@ -750,4 +872,4 @@ db.c99.updateMany(
         "$set": {"IsAllHouseHoldCountryside": 0}
     }
 );
-*/
+*/ 
