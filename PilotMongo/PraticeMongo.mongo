@@ -532,15 +532,15 @@ db.v5.aggregate([
   {
     $project: {
       checkError: {
-        $or : [
+        $or: [
           {
-          $lt: ["$IsHouseHold", "$IsHouseHoldGoodPlumbing"]
+            $lt: ["$IsHouseHold", "$IsHouseHoldGoodPlumbing"]
           },
           {
-          $lt: ["$IsHouseHold", "$IsHouseHoldHasPlumbingDistrict"]
+            $lt: ["$IsHouseHold", "$IsHouseHoldHasPlumbingDistrict"]
           },
           {
-          $lt: ["$IsHouseHold", "$IsHouseHoldHasPlumbingCountryside"]
+            $lt: ["$IsHouseHold", "$IsHouseHoldHasPlumbingCountryside"]
           }
         ]
       }
@@ -563,7 +563,7 @@ db.v5.aggregate([
   {
     $project: {
       checkError: {
-        $or : [
+        $or: [
           {
             $lt: ["$IsAllFactorial", "$IsFactorial"]
           },
@@ -577,10 +577,13 @@ db.v5.aggregate([
             $lt: ["$IsAllFactorial", "$IsFactorialWaterQuality"]
           },
           {
-             $lt: ["$IsFactorial", "$IndustryHasWasteWaterTreatment"]
+            $lt: ["$IsFactorial", "$IndustryHasWasteWaterTreatment"]
           },
           {
-             $lt: ["$IndustryHasWasteWaterTreatment", "$IsFactorialWaterTreatment"]
+            $lt: [
+              "$IndustryHasWasteWaterTreatment",
+              "$IsFactorialWaterTreatment"
+            ]
           }
         ]
       }
@@ -612,4 +615,170 @@ db.v5.aggregate([
   }
 ]);
 
+// test
+db.v5.aggregate(
+  [
+    {
+      $match: {
+        EA: { $ne: null },
+        Area_Code: { $ne: null },
+        Duplicate: false
+      }
+    },
+    {
+      $group: {
+        _id: "$CWT",
+        listCwt: {
+          $push: {
+            _id: "$_id",
+            SampleId: "$SampleId,SampleId",
+            SampleType: "$SampleType,",
+            EA: "$EA",
+            Status: "$Status",
+            CountPopulation: "$CountPopulation",
+            CountWorkingAge: "$CountWorkingAge",
+            ResidentialPersonCount: "$ResidentialPersonCount",
+            PopulationPersonCount: "$PopulationPersonCount",
+            Area_Code: "$Area_Code,",
+            REG: "$REG",
+            REG_NAME: "$REG_NAME",
+            CWT: "$CWT",
+            CWT_NAME: "$CWT_NAME",
+            AMP: "$AMP",
+            AMP_NAME: "$AMP_NAME",
+            TAM: "$TAM",
+            TAM_NAME: "$TAM_NAME",
+            DISTRICT: "$DISTRICT",
+            MUN: "$MUN",
+            MUN_NAME: "$MUN_NAME",
+            TAO: "$TAO",
+            TAO_NAME: "$TAO_NAME"
+          }
+        }
+      }
+    },
+    {
+      $out: "Gunt78"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
 
+db.v5.aggregate([
+  {
+    $match: {
+      EA: "11001021000025",
+      Area_Code: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumCountPopulation: {
+        $sum: "$CountPopulation"
+      },
+      sumCountWorkingAge: {
+        $sum: "$CountWorkingAge"
+      },
+      sumResidentialPersonCount: {
+        $sum: "$ResidentialPersonCount"
+      },
+      sumPopulationPersonCount: {
+        $sum: "$PopulationPersonCount"
+      }
+    }
+  },
+  {
+    $out: "sumTestPao"
+  }
+]);
+
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      SampleType: "u",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      countUnit: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "countUnit"
+  }
+]);
+
+db.v5.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      SampleType: "b",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      countBuilding: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "countBuilding"
+  }
+]);
+
+db.v5.count({ EA: "11001011000001", SampleType: "b", Duplicate: false });
+db.v5.aggregate([
+  {
+    $match: {
+      EA: "11001011000001",
+      SampleType: "b",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumB: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "TestCountBuilding"
+  }
+]);
+
+db.v5.aggregate([
+  {
+    $match: {
+      EA: "11001011000001",
+      SampleType: "u",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumB: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "TestCountUnit"
+  }
+]);

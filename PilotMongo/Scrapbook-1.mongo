@@ -603,6 +603,75 @@ db.BaseCollection3.aggregate([
   }
 ]);
 
+db.ResultPopulation.aggregate(
+  [
+    {
+      $lookup: {
+        from: "countUnit",
+        localField: "_id",
+        foreignField: "_id",
+        as: "collection0"
+      }
+    },
+    {
+      $unwind: { path: "$collection0", preserveNullAndEmptyArrays: true }
+    },
+    {
+      $lookup: {
+        from: "countBuilding",
+        localField: "_id",
+        foreignField: "_id",
+        as: "collection1"
+      }
+    },
+    {
+      $unwind: { path: "$collection1", preserveNullAndEmptyArrays: true }
+    },
+    {
+      $project: {
+        // "_id": "$_id",
+        _id: 1,
+        Area_Code:1,
+        REG: 1,
+        REG_NAME: 1,
+        CWT: 1,
+        CWT_NAME: 1,
+        AMP: 1,
+        AMP_NAME: 1,
+        TAM: 1,
+        TAM_NAME: 1,
+        DISTRICT: 1,
+        MUN: 1,
+        MUN_NAME: 1,
+        TAO: 1,
+        TAO_NAME: 1,
+        EA: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        ResidentialPersonCount: 1,
+        PopulationPersonCount: 1,
+        CountBuiding: {
+          $ifNull: ["$collection1.countBuilding", 0]
+        },
+        CountUnit: {
+          $ifNull: ["$collection0.countUnit", 0]
+        }
+      }
+    },
+    {
+      $sort: {
+        _id: 1
+      }
+    },
+    {
+      $out: "NewResultPopulation"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
+
 /*
 db.c88.aggregate([{
         "$match": {
