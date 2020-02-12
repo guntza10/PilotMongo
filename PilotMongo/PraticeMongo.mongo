@@ -782,3 +782,114 @@ db.v5.aggregate([
     $out: "TestCountUnit"
   }
 ]);
+
+db.survey.aggregate([
+  {
+    $match: {
+      SampleType: "b",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      countBuilding: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "countBuilding"
+  }
+]);
+
+db.survey.aggregate([
+  {
+    $match: {
+      SampleType: "u",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      countBuilding: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "countUnit"
+  }
+]);
+
+db.ea.aggregate(
+  [
+    {
+      $lookup: {
+        from: "countBuilding",
+        localField: "_id",
+        foreignField: "_id",
+        as: "data1"
+      }
+    },
+    {
+      $unwind: {
+        path: "$data1",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $lookup: {
+        from: "countUnit",
+        localField: "_id",
+        foreignField: "_id",
+        as: "data2"
+      }
+    },
+    {
+      $unwind: {
+        path: "$data2",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $project: {
+        Area_Code: 1,
+        REG: 1,
+        REG_NAME: 1,
+        CWT: 1,
+        CWT_NAME: 1,
+        AMP: 1,
+        AMP_NAME: 1,
+        TAM: 1,
+        TAM_NAME: 1,
+        DISTRICT: 1,
+        MUN: 1,
+        MUN_NAME: 1,
+        TAO: 1,
+        TAO_NAME: 1,
+        EA: 1,
+        CountBuilding: {
+          $ifNull: ["$data1.countBuilding", 0]
+        },
+        CountUnit: {
+          $ifNull: ["$data2.countBuilding", 0]
+        }
+      }
+    },
+    {
+      $sort: {
+        _id: 1
+      }
+    },
+    {
+      $out: "countBuildingAndUnit"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
