@@ -893,3 +893,107 @@ db.ea.aggregate(
     allowDiskUse: true
   }
 );
+
+db.ResultPopulation.aggregate(
+  [
+    {
+      $lookup: {
+        from: "countBuildingAndUnit",
+        localField: "_id",
+        foreignField: "_id",
+        as: "data"
+      }
+    },
+    {
+      $unwind: {
+        path: "$data",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $project: {
+        Area_Code: 1,
+        REG: 1,
+        REG_NAME: 1,
+        CWT: 1,
+        CWT_NAME: 1,
+        AMP: 1,
+        AMP_NAME: 1,
+        TAM: 1,
+        TAM_NAME: 1,
+        DISTRICT: 1,
+        MUN: 1,
+        MUN_NAME: 1,
+        TAO: 1,
+        TAO_NAME: 1,
+        EA: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        ResidentialPersonCount: 1,
+        PopulationPersonCount: 1,
+        CountBuilding: {
+          $ifNull: ["$data.CountBuilding", 0]
+        },
+        CountUnit: {
+          $ifNull: ["$data.CountUnit", 0]
+        }
+      }
+    },
+    {
+      $sort: {
+        _id: 1
+      }
+    },
+    {
+      $out: "FinalResultPopulation"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
+
+
+db.survey.aggregate([
+  {
+    $match: {
+      EA:"11001011000001",
+      SampleType: "b",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      countBuilding: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "TestCheckcountBuilding"
+  }
+]);
+
+db.survey.aggregate([
+  {
+    $match: {
+      EA:"11001011000001",
+      SampleType: "u",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      countUnt: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $out: "TestCheckcountUnit"
+  }
+]);
