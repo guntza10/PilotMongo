@@ -953,11 +953,10 @@ db.ResultPopulation.aggregate(
   }
 );
 
-
 db.survey.aggregate([
   {
     $match: {
-      EA:"11001011000001",
+      EA: "11001011000001",
       SampleType: "b",
       Enlisted: true,
       DeletionDateTime: null
@@ -979,7 +978,7 @@ db.survey.aggregate([
 db.survey.aggregate([
   {
     $match: {
-      EA:"11001011000001",
+      EA: "11001011000001",
       SampleType: "u",
       Enlisted: true,
       DeletionDateTime: null
@@ -997,3 +996,45 @@ db.survey.aggregate([
     $out: "TestCheckcountUnit"
   }
 ]);
+
+db.survey.aggregate([
+  {
+    $match: {
+      SampleType: "u",
+      Status: "eye-off",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $count: "TotalUnit"
+  }
+]);
+
+db.survey.aggregate([
+  {
+    $match: {
+      SampleType: "b",
+      Status: "eye-off",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $count: "TotalBuilding"
+  }
+]);
+
+db.survey.aggregate([
+  {
+    $match: {
+      SampleType: "c",
+      Enlisted: true,
+      DeletionDateTime: null
+    }
+  },
+  {
+    $count: "TotalCommunity"
+  }
+]);
+
