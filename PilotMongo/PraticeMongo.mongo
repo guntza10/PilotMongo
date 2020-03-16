@@ -1038,3 +1038,542 @@ db.survey.aggregate([
   }
 ]);
 
+db.v5.aggregate([
+  {
+    $project: {
+      Source: {
+        Name: 1
+      },
+      SampleId: 1,
+      SampleType: 1,
+      EA: 1,
+      Area_Code: 1,
+      Status: 1,
+      Count: 1,
+      CubicMeterPerMonth: 1,
+      WaterBill: 1,
+      PumpCount: 1,
+      PumpAuto: 1,
+      TurbidWater: 1,
+      SaltWater: 1,
+      Smell: 1,
+      FilmOfOil: 1,
+      FogWater: 1,
+      HardWater: 1,
+      Agriculture: 1,
+      Service: 1,
+      Product: 1,
+      Drink: 1,
+      Plant: 1,
+      Farm: 1,
+      CubicMeterBuyingForAgriculture: 1,
+      CubicMeterBuyingForService: 1,
+      CubicMeterBuyingForProduct: 1,
+      CubicMeterBuyingForDrink: 1,
+      DoingMWA: 1,
+      CubicMeterPerMonthMWA: 1,
+      WaterBillMWA: 1,
+      TurbidWaterMWA: 1,
+      SaltWaterMWA: 1,
+      SmellMWA: 1,
+      FilmOfOilMWA: 1,
+      FogWaterMWA: 1,
+      HardWaterMWA: 1,
+      AgricultureMWA: 1,
+      ServiceMWA: 11,
+      ProductMWA: 1,
+      DrinkMWA: 1,
+      PlantMWA: 1,
+      DoingPWA: 1,
+      CubicMeterPerMonthPWA: 1,
+      WaterBillPWA: 1,
+      TurbidWaterPWA: 1,
+      SaltWaterPWA: 1,
+      SmellPWA: 1,
+      FilmOfOilPWA: 1,
+      FogWaterPWA: 1,
+      HardWaterPWA: 1,
+      AgriculturePWA: 1,
+      ServicePWA: 1,
+      ProductPWA: 1,
+      DrinkPWA: 1,
+      PlantPWA: 1,
+      DoingOther: 1,
+      CubicMeterPerMonthOther: 1,
+      WaterBillOther: 1,
+      TurbidWaterOther: 1,
+      SaltWaterOther: 1,
+      SmellOther: 1,
+      FilmOfOilOther: 1,
+      FogWaterOther: 1,
+      HardWaterOther: 1,
+      AgricultureOther: 1,
+      ServiceOther: 1,
+      ProductOther: 1,
+      DrinkOther: 1,
+      PlantOther: 1,
+      MeterRentalFee: 1,
+      PlumbingPrice: 1,
+      PoolCount: 1,
+      WaterResourceCount: 1,
+      CubicMeterPerMonthPool: 1,
+      PumpCountPool: 1,
+      PumpAutoPool: 1,
+      SaltWaterPool: 1,
+      SmellPool: 1,
+      FilmOfOilPool: 1,
+      FogWaterPool: 1,
+      AgriculturePool: 1,
+      ServicePool: 1,
+      ProductPool: 1,
+      DrinkPool: 1,
+      PlantPool: 1,
+      FarmPool: 1,
+      CubicMeterPerMonthIrrigation: 1,
+      PumpCountIrrigation: 1,
+      PumpAutoIrrigation: 1,
+      SaltWaterIrrigation: 1,
+      SmellIrrigation: 1,
+      FilmOfOilIrrigation: 1,
+      FogWaterIrrigation: 1,
+      AgricultureIrrigation: 1,
+      ServiceIrrigation: 1,
+      ProductIrrigation: 1,
+      DrinkIrrigation: 1,
+      PlantIrrigation: 1,
+      FarmIrrigation: 1,
+      PumpCountRiver: 1,
+      PumpAutoRiver: 1,
+      SaltWaterRiver: 1,
+      SmellRiver: 1,
+      FilmOfOilRiver: 1,
+      FogWaterRiver: 1,
+      AgricultureRiver: 1,
+      ServiceRiver: 1,
+      ProductRiver: 1,
+      DrinkRiver: 1,
+      PlantRiver: 1,
+      FarmRiver: 1,
+      AgricultureRain: 1,
+      ServiceRain: 1,
+      ProductRain: 1,
+      DrinkRain: 1,
+      PlantRain: 1,
+      CanComputeCubicMeterGroundWaterForAgriculture: 1,
+      CanComputeCubicMeterGroundWaterForService: 1,
+      CanComputeCubicMeterGroundWaterForProduct: 1,
+      CanComputeCubicMeterGroundWaterForDrink: 1,
+      CanComputeCubicMeterPlumbingForAgriculture: 1,
+      CanComputeCubicMeterPlumbingForService: 1,
+      CanComputeCubicMeterPlumbingForProduct: 1,
+      CanComputeCubicMeterPlumbingForDrink: 1,
+      CanComputeCubicMeterSurfaceForAgriculture: 1,
+      CanComputeCubicMeterSurfaceForService: 1,
+      CanComputeCubicMeterSurfaceForProduct: 1,
+      CanComputeCubicMeterSurfaceForDrink: 1,
+      CanComputeCubicMeterGroundWaterForUse: 1,
+      CanComputeCubicMeterForDrink: 1,
+      IsAgriculture: 1,
+      IsHouseHold: 1,
+      IsHouseHoldGoodPlumbing: 1,
+      IsAgricultureHasIrrigationField: 1,
+      IsHouseHoldHasPlumbingDistrict: 1,
+      IsHouseHoldHasPlumbingCountryside: 1,
+      IsFactorialWaterQuality: 1,
+      IsCommercialWaterQuality: 1,
+      CountGroundWater: 1,
+      CountPopulation: "$ResidentialPersonCount",
+      CountWorkingAge: 1,
+      IsFactorial: 1,
+      IsFactorialWaterTreatment: 1,
+      IsCommunityWaterManagementHasWaterTreatment: 1,
+      FieldCommunity: 1,
+      AvgWaterHeightCm: 1,
+      TimeWaterHeightCm: 1,
+      HasntPlumbing: 1,
+      IsGovernment: 1,
+      IsGovernmentUsage: 1,
+      IsGovernmentWaterQuality: 1,
+      CommunityNatureDisaster: 1,
+      WaterSources: 1,
+      IndustryHasWasteWaterTreatment: 1,
+      PeopleInFloodedArea: 1,
+      CubicMeterGroundWaterForAgriculture: 1,
+      CubicMeterGroundWaterForService: 1,
+      CubicMeterGroundWaterForProduct: 1,
+      CubicMeterGroundWaterForDrink: 1,
+      CubicMeterPlumbingForAgriculture: 1,
+      CubicMeterPlumbingForService: 342.8571,
+      CubicMeterPlumbingForProduct: 1,
+      CubicMeterPlumbingForDrink: 1,
+      CubicMeterSurfaceForAgriculture: 1,
+      CubicMeterSurfaceForService: 1,
+      CubicMeterSurfaceForProduct: 1,
+      CubicMeterSurfaceForDrink: 1,
+      CubicMeterGroundWaterForUse: 1,
+      CountCommunity: 1,
+      CountCommunityHasDisaster: 1,
+      IsAllHouseHoldCountryside: 1,
+      IsAllHouseHoldDistrict: 1,
+      IsAllFactorial: 1,
+      IsAllCommercial: 1,
+      CubicMeterForDrink: 1,
+      Duplicate: 1,
+      AdjustedCubicMeterGroundWaterForAgriculture: 1,
+      AdjustedCubicMeterGroundWaterForService: 1,
+      AdjustedCubicMeterGroundWaterForProduct: 1,
+      AdjustedCubicMeterGroundWaterForDrink: 1,
+      AdjustedCubicMeterSurfaceForAgriculture: 1,
+      AdjustedCubicMeterSurfaceForService: 1,
+      AdjustedCubicMeterSurfaceForProduct: 1,
+      AdjustedCubicMeterSurfaceForDrink: 1,
+      AdjustedCubicMeterGroundWaterForUse: 1
+    }
+  },
+  {
+    $out: "v6"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      Duplicate: false,
+      CountPopulation: { $ne: 0 },
+      IsHouseHold: 0
+    }
+  },
+  {
+    $out: "CheckResolveIsHouseHold"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      SampleType: "u",
+      Duplicate: false,
+      CountPopulation: { $ne: 0 },
+      IsHouseHold: 0
+    }
+  },
+  {
+    $out: "UnitCheckResolveIsHouseHold"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Area_Code: { $ne: null },
+      SampleType: "b",
+      Duplicate: false,
+      CountPopulation: { $ne: 0 },
+      IsHouseHold: 0
+    }
+  },
+  {
+    $out: "HouseHoldCheckResolveIsHouseHold"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumCountPopulation: {
+        $sum: "$CountPopulation"
+      }
+    }
+  },
+  {
+    $match: {
+      sumCountPopulation: { $gte: 20000 }
+    }
+  },
+  {
+    $out: "CountPopulationOver20000"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: {
+        $substr: ["$EA", 0, 1]
+      },
+      sumFieldCommunity: {
+        $sum: "$FieldCommunity"
+      },
+      countRegion: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $project: {
+      avgRegion: {
+        $divide: ["$sumFieldCommunity", "$countRegion"]
+      }
+    }
+  },
+  {
+    $out: "AvgFieldCommunity"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: { $ne: null },
+      Duplicate: false,
+      CountPopulation: { $gte: 20000 }
+    }
+  },
+  {
+    $project: {
+      IdofOver: "$_id",
+      EA: "$EA"
+    }
+  },
+  {
+    $out: "DataOver20000"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: "44515041044008",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumCountPopulation: {
+        $sum: "$CountPopulation"
+      },
+      maxPopulation: {
+        $max: "$CountPopulation"
+      },
+      countRegion: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $project: {
+      sumCountPopulation: 1,
+      maxPopulation: 1,
+      countRegion: 1,
+      avgRegion: {
+        $divide: [
+          {
+            $subtract: ["$sumCountPopulation", "$maxPopulation"]
+          },
+          {
+            $subtract: ["$countRegion", 1]
+          }
+        ]
+      }
+    }
+  },
+  {
+    $out: "AvgFor44515041044008"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: "22406052005003",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumCountPopulation: {
+        $sum: "$CountPopulation"
+      },
+      maxPopulation: {
+        $max: "$CountPopulation"
+      },
+      countRegion: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $project: {
+      sumCountPopulation: 1,
+      maxPopulation: 1,
+      countRegion: 1,
+      avgRegion: {
+        $divide: [
+          {
+            $subtract: ["$sumCountPopulation", "$maxPopulation"]
+          },
+          {
+            $subtract: ["$countRegion", 1]
+          }
+        ]
+      }
+    }
+  },
+  {
+    $out: "AvgFor22406052005003"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      EA: "43101172009011",
+      Duplicate: false
+    }
+  },
+  {
+    $group: {
+      _id: "$EA",
+      sumCountPopulation: {
+        $sum: "$CountPopulation"
+      },
+      maxPopulation: {
+        $max: "$CountPopulation"
+      },
+      countRegion: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $project: {
+      sumCountPopulation: 1,
+      maxPopulation: 1,
+      countRegion: 1,
+      avgRegion: {
+        $divide: [
+          {
+            $subtract: ["$sumCountPopulation", "$maxPopulation"]
+          },
+          {
+            $subtract: ["$countRegion", 1]
+          }
+        ]
+      }
+    }
+  },
+  {
+    $out: "AvgFor43101172009011"
+  }
+]);
+
+db.v6.aggregate([
+  {
+    $match: {
+      SampleType: "b",
+      IsHouseHold: 0,
+      CountPopulation: { $ne: 0 },
+      Duplicate: false
+    }
+  },
+  {
+    $out: "CheckHouseHold0butPopulationHas2"
+  }
+]);
+
+db.Survey.aggregate([
+  {
+    $project: {
+      SampleId: 1,
+      SampleType: 1,
+      BuildingId: 1,
+      EA: 1,
+      ContainerName: 1,
+      BlobName: 1,
+      Status: 1,
+      Enlisted: { $toBool: false },
+      DeletionDateTime: 1
+    }
+  },
+  {
+    $out: "SurveyCleaning"
+  }
+]);
+
+db.blobNameExists.aggregate(
+  [
+    {
+      $match: {
+        Exists: true
+      }
+    },
+    {
+      $group: {
+        _id: "$ContainerName",
+        listBlob: {
+          $push: "$$ROOT"
+        }
+      }
+    },
+    {
+      $project: {
+        listBlob: "$listBlob.BlobName"
+      }
+    },
+    {
+      $out: "BlobExistTrue"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
+
+db.blobNameExists.aggregate(
+  [
+    {
+      $match: {
+        Exists: false
+      }
+    },
+    {
+      $group: {
+        _id: "$ContainerName",
+        listBlob: {
+          $push: "$$ROOT"
+        }
+      }
+    },
+    {
+      $project: {
+        listBlob: "$listBlob.BlobName"
+      }
+    },
+    {
+      $out: "BlobExistFalse"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
