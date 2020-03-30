@@ -1640,7 +1640,9 @@ db.oldDataProcess.aggregate([
 ]);
 
 db.oldDataProcess.updateMany(
-  {},
+  {
+    SampleType: { $ne: "b" }
+  },
   {
     $set: {
       CountPopulation: 0
@@ -1789,7 +1791,15 @@ db.oldDataProcess.aggregate([
       IsFactorialWaterQuality: 1,
       IsCommercialWaterQuality: 1,
       CountGroundWater: 1,
-      CountPopulation: "$ResidentialPersonCount",
+      CountPopulation: {
+        $cond: {
+          if: {
+            $ne: ["$SampleType", "b"]
+          },
+          then: "$ResidentialPersonCount",
+          else: "$CountPopulation"
+        }
+      },
       CountWorkingAge: 1,
       IsFactorial: 1,
       IsFactorialWaterTreatment: 1,
@@ -1840,6 +1850,249 @@ db.oldDataProcess.aggregate([
     }
   },
   {
-    $out: "oldDataProcessCleaning"
+    $out: "oldDataProcessClean"
   }
 ]);
+
+db.oldDataProcess.updateMany(
+  {
+    SampleType: "u",
+    IsHouseHold: 0.0,
+    CountPopulation: { $gt: 0.0 }
+  },
+  {
+    $set: {
+      CountPopulation: 0
+    }
+  }
+);
+
+db.oldDataProcess.aggregate(
+  [
+    {
+      $group: {
+        _id: "$EA",
+        IsAgriculture: {
+          $sum: "$IsAgriculture"
+        },
+        IsHouseHold: {
+          $sum: "$IsHouseHold"
+        },
+        IsHouseHoldGoodPlumbing: {
+          $sum: "$IsHouseHoldGoodPlumbing"
+        },
+        IsAgricultureHasIrrigationField: {
+          $sum: "$IsAgricultureHasIrrigationField"
+        },
+        IsHouseHoldHasPlumbingDistrict: {
+          $sum: "$IsHouseHoldHasPlumbingDistrict"
+        },
+        IsHouseHoldHasPlumbingCountryside: {
+          $sum: "$IsHouseHoldHasPlumbingCountryside"
+        },
+        IsFactorialWaterQuality: {
+          $sum: "$IsFactorialWaterQuality"
+        },
+        IsCommercialWaterQuality: {
+          $sum: "$IsCommercialWaterQuality"
+        },
+        CountPopulation: {
+          $sum: "$CountPopulation"
+        },
+        CountWorkingAge: {
+          $sum: "$CountWorkingAge"
+        },
+        IsFactorial: {
+          $sum: "$IsFactorial"
+        },
+        IsFactorialWaterTreatment: {
+          $sum: "$IsFactorialWaterTreatment"
+        },
+        IsCommunityWaterManagementHasWaterTreatment: {
+          $sum: "$IsCommunityWaterManagementHasWaterTreatment"
+        },
+        FieldCommunity: {
+          $sum: "$FieldCommunity"
+        },
+        AvgWaterHeightCm: {
+          $avg: "$AvgWaterHeightCm"
+        },
+        TimeWaterHeightCm: {
+          $avg: "$TimeWaterHeightCm"
+        },
+        HasntPlumbing: {
+          $avg: "$HasntPlumbing"
+        },
+        IsGovernment: {
+          $sum: "$IsGovernment"
+        },
+        IsGovernmentUsage: {
+          $sum: "$IsGovernmentUsage"
+        },
+        IsGovernmentWaterQuality: {
+          $sum: "$IsGovernmentWaterQuality"
+        },
+        CommunityNatureDisaster: {
+          $sum: "$CommunityNatureDisaster"
+        },
+        IndustryHasWasteWaterTreatment: {
+          $sum: "$IndustryHasWasteWaterTreatment"
+        },
+        PeopleInFloodedArea: {
+          $sum: "$PeopleInFloodedArea"
+        },
+        CountCommunity: {
+          $sum: "$CountCommunity"
+        },
+        CountCommunityHasDisaster: {
+          $sum: "$CountCommunityHasDisaster"
+        },
+        IsAllHouseHoldCountryside: {
+          $sum: "$IsAllHouseHoldCountryside"
+        },
+        IsAllHouseHoldDistrict: {
+          $sum: "$IsAllHouseHoldDistrict"
+        },
+        IsAllFactorial: {
+          $sum: "$IsAllFactorial"
+        },
+        IsAllCommercial: {
+          $sum: "$IsAllCommercial"
+        }
+      }
+    },
+    {
+      $project: {
+        IsAgriculture: 1,
+        IsHouseHold: 1,
+        IsHouseHoldGoodPlumbing: 1,
+        IsAgricultureHasIrrigationField: 1,
+        IsHouseHoldHasPlumbingDistrict: 1,
+        IsHouseHoldHasPlumbingCountryside: 1,
+        IsFactorialWaterQuality: 1,
+        IsCommercialWaterQuality: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        IsFactorial: 1,
+        IsFactorialWaterTreatment: 1,
+        IsCommunityWaterManagementHasWaterTreatment: 1,
+        FieldCommunity: 1,
+        AvgWaterHeightCm: 1,
+        TimeWaterHeightCm: 1,
+        HasntPlumbing: 1,
+        IsGovernment: 1,
+        IsGovernmentUsage: 1,
+        IsGovernmentWaterQuality: 1,
+        CommunityNatureDisaster: 1,
+        IndustryHasWasteWaterTreatment: 1,
+        PeopleInFloodedArea: 1,
+        CountCommunity: 1,
+        CountCommunityHasDisaster: 1,
+        IsAllHouseHoldCountryside: 1,
+        IsAllHouseHoldDistrict: 1,
+        IsAllFactorial: 1,
+        IsAllCommercial: 1,
+        CountGroundWaterUnit: {
+          $toInt: 0
+        },
+        CountGroundWaterCom: {
+          $toInt: 0
+        },
+        WaterSourcesUnit: {
+          $toInt: 0
+        },
+        WaterSourcesCom: {
+          $toInt: 0
+        }
+      }
+    },
+    {
+      $out: "ResultDataEA"
+    }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
+
+db.oldDataProcess.aggregate(
+  [
+    {
+      $group: {
+        _id: "$Area_Code",
+        CubicMeterGroundWaterForAgriculture: {
+          $sum: "$CubicMeterGroundWaterForAgriculture"
+        },
+        CubicMeterGroundWaterForService: {
+          $sum: "$CubicMeterGroundWaterForService"
+        },
+        CubicMeterGroundWaterForProduct: {
+          $sum: "$CubicMeterGroundWaterForProduct"
+        },
+        CubicMeterGroundWaterForDrink: {
+          $sum: "$CubicMeterGroundWaterForDrink"
+        },
+        CubicMeterPlumbingForAgriculture: {
+          $sum: "$CubicMeterPlumbingForAgriculture"
+        },
+        CubicMeterPlumbingForService: {
+          $sum: "$CubicMeterPlumbingForService"
+        },
+        CubicMeterPlumbingForProduct: {
+          $sum: "$CubicMeterPlumbingForProduct"
+        },
+        CubicMeterPlumbingForDrink: {
+          $sum: "$CubicMeterPlumbingForDrink"
+        },
+        CubicMeterSurfaceForAgriculture: {
+          $sum: "$CubicMeterSurfaceForAgriculture"
+        },
+        CubicMeterSurfaceForService: {
+          $sum: "$CubicMeterSurfaceForService"
+        },
+        CubicMeterSurfaceForProduct: {
+          $sum: "$CubicMeterSurfaceForProduct"
+        },
+        CubicMeterSurfaceForDrink: {
+          $sum: "$CubicMeterSurfaceForDrink"
+        },
+        CubicMeterGroundWaterForUse: {
+          $sum: "$CubicMeterGroundWaterForUse"
+        }
+      }
+    },
+    {
+      $project: {
+        CubicMeterGroundWaterForAgriculture: 1,
+        CubicMeterGroundWaterForService: 1,
+        CubicMeterGroundWaterForProduct: 1,
+        CubicMeterGroundWaterForDrink: 1,
+        CubicMeterPlumbingForAgriculture: 1,
+        CubicMeterPlumbingForService: 1,
+        CubicMeterPlumbingForProduct: 1,
+        CubicMeterPlumbingForDrink: 1,
+        CubicMeterSurfaceForAgriculture: 1,
+        CubicMeterSurfaceForService: 1,
+        CubicMeterSurfaceForProduct: 1,
+        CubicMeterSurfaceForDrink: 1,
+        CubicMeterGroundWaterForUse: 1,
+        CountGroundWaterUnit: {
+          $toInt: 0
+        },
+        CountGroundWaterCom: {
+          $toInt: 0
+        },
+        WaterSourcesUnit: {
+          $toInt: 0
+        },
+        WaterSourcesCom: {
+          $toInt: 0
+        }
+      }
+    },
+    { $out: "ResultDataAreaCode" }
+  ],
+  {
+    allowDiskUse: true
+  }
+);
