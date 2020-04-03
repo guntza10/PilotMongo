@@ -2096,3 +2096,44 @@ db.oldDataProcess.aggregate(
     allowDiskUse: true
   }
 );
+
+db.Survey.updateMany(
+  {},
+  {
+    $set: {
+      Enlisted: false
+    }
+  }
+);
+
+db.Survey.aggregate([
+  {
+    $match: {
+      Enlisted: false
+    }
+  },
+  {
+    $count: "countTrue"
+  },
+  {
+    $out: "CountTrueEnlistedSurvey"
+  }
+]);
+
+db.oldDataProcess.aggregate([
+  {
+    $match: {
+      IsHouseHold: 0,
+      IsAgriculture: 0,
+      IsAllFactorial: 0,
+      IsAllCommercial: 0,
+      HasntPlumbing: 0
+    }
+  },
+  {
+    $count: "count"
+  },
+  {
+    $out: "CountWithOutGHasntPlumbing0"
+  }
+]);
