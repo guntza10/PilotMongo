@@ -2098,7 +2098,9 @@ db.oldDataProcess.aggregate(
 );
 
 db.Survey.updateMany(
-  {},
+  {
+    Enlisted: true
+  },
   {
     $set: {
       Enlisted: false
@@ -2109,14 +2111,28 @@ db.Survey.updateMany(
 db.Survey.aggregate([
   {
     $match: {
+      Enlisted: true
+    }
+  },
+  {
+    $count: "count"
+  },
+  {
+    $out: "CountTrueEnlistedSurvey"
+  }
+]);
+
+db.Survey.aggregate([
+  {
+    $match: {
       Enlisted: false
     }
   },
   {
-    $count: "countTrue"
+    $count: "count"
   },
   {
-    $out: "CountTrueEnlistedSurvey"
+    $out: "CountFalseEnlistedSurvey"
   }
 ]);
 
